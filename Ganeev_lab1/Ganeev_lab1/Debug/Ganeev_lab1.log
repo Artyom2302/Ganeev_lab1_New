@@ -1,0 +1,13 @@
+﻿  main.cpp
+C:\Users\Артём\Documents\GitHub\Ganeev_lab1\Ganeev_lab1\Ganeev_lab1\main.cpp(174,6): warning C4101: key: неиспользованная локальная переменная
+C:\Users\Артём\Documents\GitHub\Ganeev_lab1\Ganeev_lab1\Ganeev_lab1\main.cpp(216,42): warning C4018: <=: несоответствие типов со знаком и без знака
+C:\Users\Артём\Documents\GitHub\Ganeev_lab1\Ganeev_lab1\Ganeev_lab1\main.cpp(221,46): warning C4018: <=: несоответствие типов со знаком и без знака
+C:\Users\Артём\Documents\GitHub\Ganeev_lab1\Ganeev_lab1\Ganeev_lab1\main.cpp(294,42): warning C4018: <=: несоответствие типов со знаком и без знака
+C:\Users\Артём\Documents\GitHub\Ganeev_lab1\Ganeev_lab1\Ganeev_lab1\main.cpp(299,46): warning C4018: <=: несоответствие типов со знаком и без знака
+C:\Users\Артём\Documents\GitHub\Ganeev_lab1\Ganeev_lab1\Ganeev_lab1\main.cpp(450,22): warning C4244: =: преобразование "double" в "int", возможна потеря данных
+C:\Users\Артём\Documents\GitHub\Ganeev_lab1\Ganeev_lab1\Ganeev_lab1\main.cpp(452,22): warning C4244: =: преобразование "double" в "int", возможна потеря данных
+C:\Users\Артём\Documents\GitHub\Ganeev_lab1\Ganeev_lab1\Ganeev_lab1\main.cpp(603,24): warning C4018: <: несоответствие типов со знаком и без знака
+C:\Users\Артём\Documents\GitHub\Ganeev_lab1\Ganeev_lab1\Ganeev_lab1\main.cpp(615,24): warning C4018: <: несоответствие типов со знаком и без знака
+C:\Users\Артём\Documents\GitHub\Ganeev_lab1\Ganeev_lab1\Ganeev_lab1\main.cpp(641,23): warning C4018: <: несоответствие типов со знаком и без знака
+C:\Users\Артём\Documents\GitHub\Ganeev_lab1\Ganeev_lab1\Ganeev_lab1\main.cpp(653,23): warning C4018: <: несоответствие типов со знаком и без знака
+  Ganeev_lab1.vcxproj -> C:\Users\Артём\Documents\GitHub\Ganeev_lab1\Ganeev_lab1\Debug\Ganeev_lab1.exe
