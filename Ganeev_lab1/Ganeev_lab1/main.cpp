@@ -583,10 +583,14 @@ int main() {
 				id = FindPipeByFilter(pipesmap,CheckByName,name);
 				if (id.size() != 0) {
 					HeaderPipe();
-
 					for (int i = 0; i < id.size(); ++i) {
 						OutInfo(pipesmap[id[i]]);
 					}
+					
+
+				}
+				else {
+					cout << "По данному фильтру ничего не найдено";
 				}
 
 			}
@@ -600,12 +604,24 @@ int main() {
 					for (int i = 0; i < id.size(); ++i) {
 						OutInfo(pipesmap[id[i]]);
 					}
+					cout << "Нажмите 1,чтобы выйти и 2,чтобы отредактировать  трубы\n";
+					choice = EnterChoice();
+					if (choice == '1') {
+						break;
+					}
+					else if(choice=='2')
+					{
+						for (int i = 0; i < id.size(); ++i) {
+							EditPipe(pipesmap[id[i]]);
+						}
+					}
+				}
+				else {
+					cout << "По данному фильтру ничего не найдено\n";
 				}
 
 			}
-			else
-				cout << "Нажата не та клавиша";
-
+	
 
 			break;
 
@@ -629,6 +645,9 @@ int main() {
 				for (int i = 0; i < id.size(); ++i) {
 					OutInfo(compressorsmap[id[i]]);
 				}
+			}
+			else {
+				cout << "По данному фильтру ничего не найдено";
 			}
 
 		}
@@ -659,6 +678,21 @@ int main() {
 				for (int i = 0; i < id.size(); ++i) {
 					OutInfo(compressorsmap[id[i]]);
 				}
+
+				cout << "Нажмите 1,чтобы выйти и 2,чтобы отредактировать  компрессорные станции\n";
+				choice = EnterChoice();
+				if (choice == '1') {
+					break;
+				}
+				else if (choice == '2')
+				{
+					for (int i = 0; i < id.size(); ++i) {
+						EditCompressor(compressorsmap[id[i]]);
+					}
+				}
+			}
+			else {
+				cout << "По данному фильтру ничего не найдено";
 			}
 		}
 		
