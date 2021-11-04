@@ -8,11 +8,11 @@ class Pipe
 	unsigned int diameter;
 	double length;
 	bool repair;
+
 	Pipe();
-	bool GetPipeStatus();
 	Pipe(int id);
-	void EditPipe();
-	void static HeaderPipe();
+	void Edit();
+	void static Header();
 	void OutInfo();
 };
 
