@@ -2,8 +2,11 @@
 #include "main.h"
 using namespace std;
 class Pipe
-{	public:
-	unsigned int id;
+{
+	static unsigned int  maxid;
+
+public:
+	unsigned int  id;
 	string name;
 	unsigned int diameter;
 	double length;

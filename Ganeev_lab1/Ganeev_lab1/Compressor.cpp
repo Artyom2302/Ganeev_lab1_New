@@ -68,13 +68,14 @@ void Compressor::OutInfo()
 		<< workshopsinwork << setw(20) << performance << endl;
 }
 
-double Compressor::PercentOfOutWork(Compressor c)
+double Compressor::PercentOfOutWork() const
 {
 	double value;
-	value = c.workshops - c.workshopsinwork;
-	value /= c.workshops;
+	value = workshops - workshopsinwork;
+	value /= workshops;
 	return value * 100;
 }
+
 
 
 

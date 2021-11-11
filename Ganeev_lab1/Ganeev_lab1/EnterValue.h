@@ -5,5 +5,5 @@
 using namespace std;
 string EnterName();
 double EnterUDouble();
-int EnterUInt();
+unsigned int EnterUInt();
 bool EnterBool();

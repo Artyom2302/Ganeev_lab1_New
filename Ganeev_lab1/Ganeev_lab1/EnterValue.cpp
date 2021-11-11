@@ -22,7 +22,7 @@ double EnterUDouble() {
 	} while (!(CheckDouble(value)));
 	return stod(value);
 }
-int EnterUInt() {
+unsigned int EnterUInt() {
 	string value;
 	do
 	{

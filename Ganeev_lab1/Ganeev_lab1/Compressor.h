@@ -2,12 +2,14 @@
 #include "main.h"
 using namespace std;
 class Compressor {
+	static unsigned int  maxid;
+
 public:
-	unsigned int id = 0;
+	unsigned int id;
 	string name;
-	unsigned int workshops = 0;//цехи
-	unsigned int workshopsinwork = 0;//цехи в работе
-	double performance = 0;//эффективность
+	unsigned int workshops ;
+	unsigned int workshopsinwork;
+	double performance ;
 	
 
 	Compressor();
@@ -15,6 +17,6 @@ public:
 	void Edit();
 	void static Header();
 	void OutInfo();
-	double static PercentOfOutWork(Compressor c);
+	double PercentOfOutWork() const;
 	
 };
