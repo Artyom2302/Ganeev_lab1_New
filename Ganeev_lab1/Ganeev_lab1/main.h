@@ -14,3 +14,4 @@
 #include "EnterValue.h"
 #include "Pipe.h"
 #include "Compressor.h"
+#include <algorithm>

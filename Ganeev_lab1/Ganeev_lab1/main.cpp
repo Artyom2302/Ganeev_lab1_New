@@ -24,7 +24,6 @@ int RandomId() {
 
 
 
-
 void MainMenu()
 {
 	cout << endl << "1. Добавить трубу" << endl <<
@@ -36,106 +35,14 @@ void MainMenu()
 		"7. Загрузить" << endl <<
 		"8. Поиск труб" << endl <<
 		"9. Поиск КС" << endl <<
-		"10.Удаление всех труб " << endl <<
-		"11.Удаление всех КС " << endl <<
-		"0. Выход" << endl <<
+		"10.Удаление  труб " << endl <<
+		"11.Удаление  КС " << endl <<
+		"12.Вывод на печать " << endl <<
+		"13.Выход" << endl <<
 		"Введите пункт меню: " << endl;
 }
 
 
-void SaveBuff(const unordered_map <int, Pipe>& pipes, const unordered_map <int, Compressor>& compressors, string filename) {//в отдельном
-	ofstream fbuff;
-	filename += "buff";
-	fbuff.open(filename);
-	for (auto& p : pipes)
-		fbuff << "Труба\n" << p.second.id << endl << p.second.name << endl << p.second.length << endl << p.second.diameter << endl << p.second.repair << endl;
-	for (auto& c : compressors)
-		fbuff << "КС\n" << c.second.id << endl << c.second.name << endl << c.second.workshops << endl
-		<< c.second.workshopsinwork << endl << c.second.performance << endl;
-	fbuff.close();
-}
-
-
-void SaveInfo(const unordered_map <int, Pipe>& pipes, const unordered_map <int, Compressor>& compressors, string filename) {
-	ofstream fout;
-	fout.open(filename);
-	fout << "Общая информация\n";
-	fout << "Трубы\n";
-	fout << setw(10) << "Id " << setw(20) << "Имя" << setw(20) << "Длина" << setw(20) << "Диаметр" << setw(40) << "Состояние(В ремонте или нет)\n";
-	for (auto& p : pipes)
-	{
-		fout << setw(10) << p.second.id << setw(20) << p.second.name << setw(20) << p.second.length << setw(20) << p.second.diameter;
-		if (p.second.repair) {
-			fout << setw(40) << "В ремонте\n";
-		}
-		else
-		{
-			fout << setw(40) << "В эксплуатации\n";
-		}
-
-	}
-
-	fout << "\nКомпрессорные станции\n";
-	fout << setw(10) << "Id " << setw(20) << "Название" << setw(30) << "Общее количество цехов"
-		<< setw(30) << "Количество цехов в работе" << setw(20) << "Эффективность" << endl;
-	for (auto& c : compressors)
-	{
-		fout << setw(10) << c.second.id << setw(20) << c.second.name << setw(30) << c.second.workshops << setw(30)
-			<< c.second.workshopsinwork << setw(20) << c.second.performance << endl;
-	}
-	fout.close();
-
-}
-void LoadInfo(unordered_map <int, Pipe>& pipes, unordered_map <int, Compressor>& compressors, string filename) {
-	string str;
-	filename += "buff";
-	ifstream in(filename);
-	Pipe pipebuff;
-	Compressor compressorbuff;
-	if (in.is_open()) {
-		do
-		{
-			getline(in, str);
-			if (str == "Труба") {
-
-				getline(in, str);
-				pipebuff.id = stoi(str);
-
-				getline(in, str);
-				pipebuff.name = str;
-
-				getline(in, str);
-				pipebuff.length = stof(str);
-
-				getline(in, str);
-				pipebuff.diameter = stoi(str);
-
-				getline(in, str);
-				pipebuff.repair = stoi(str);
-				pipes.insert({ pipebuff.id,pipebuff });
-			}
-			else if (str == "КС") {
-				getline(in, str);
-				compressorbuff.id = stoi(str);
-				getline(in, str);
-				compressorbuff.name = str;
-				getline(in, str);
-				compressorbuff.workshops = stoi(str);
-				getline(in, str);
-				compressorbuff.workshopsinwork = stoi(str);
-				getline(in, str);
-				compressorbuff.performance = stod(str);
-				compressors.insert({ compressorbuff.id,compressorbuff });
-
-			}
-		} while (str != "");
-	}
-	else {
-		cout << "Такого файла не существует!!!";
-	}
-
-	in.close();
-};
 
 template<typename T_param>
 using PipeFilter = bool(*)(const  Pipe& p, T_param param);
@@ -211,13 +118,11 @@ vector <int> EnterIDs(const unordered_map <int, Pipe>& pipesmap) {
 				}
 		if (id!=0)
 		IDs.push_back(id);
-		
-			
 		}
 			
 		cout << " Продолжить ввод ID?(1-да |0-нет )\n";
 
-	} while (EnterBool());
+	} while (EnterBool() &&	IDs.size()!=pipesmap.size());
 	return IDs;
 }
 
@@ -251,11 +156,167 @@ vector <int> EnterIDs(const unordered_map <int, Compressor>& compressorsmap) {
 	return IDs;
 }
 
-
-
-void EditAllPipes( unordered_map <int ,Pipe> &pipesmap){
-		
+void ShowAllPipes(const unordered_map <int, Pipe> &pipes) {
+	Seporator();
+	if (pipes.size() != 0)
+	{
+		cout << "Трубы\n";
+		Pipe::Header();
+		for (auto& p : pipes)
+		{
+			cout << p.second;
+		}
+	}
+	else
+	{
+		cout << "Нет ни одной трубы\n";
+	}
 }
+void ShowAllCompressors(const unordered_map <int, Compressor> &compressors) {
+	Seporator();
+
+	if (compressors.size() != 0) {
+		cout << "Компрессорные станции\n";
+		Compressor::Header();
+		for (auto& c : compressors)
+		{
+			cout << c.second;
+		}
+	}
+	else
+	{
+		cout << "Нет ни одной компрессорной станции\n";
+	}
+	Seporator();
+}
+
+vector <int> FindAllPipesByName(const unordered_map <int, Pipe>& pipesmap) {
+	string name = EnterName();
+	vector <int> IDs = FindPipeByFilter(pipesmap, CheckByName, name);
+	if (IDs.size() != 0) {
+		Pipe::Header();
+		for (int i = 0; i < IDs.size(); ++i) {
+			cout << pipesmap.at(IDs[i]);
+		}
+		return IDs;
+	}
+	else {
+		cout << "По данному фильтру ничего не найдено";
+		return { };
+	}
+}
+
+vector <int> FindAllPipesByRepair(const unordered_map <int, Pipe>& pipesmap) {
+	cout << "Нажмите 1,если нужен поиск труб в ремонте или 0,если поиск труб в эксплуатации\n";
+	bool repair = EnterBool();
+	vector <int> IDs = FindPipeByFilter(pipesmap, CheckByRepair, repair);
+	if (IDs.size() != 0) {
+		Pipe::Header();
+		for (int i = 0; i < IDs.size(); ++i) {
+			cout << pipesmap.at(IDs[i]);
+		}
+		return IDs;
+	}
+	else {
+		cout << "По данному фильтру ничего не найдено";
+		return { };
+	}
+}
+vector <int> FindAllKSByName(const unordered_map <int, Compressor>& compressorsmap) {
+	string name = EnterName();
+	vector <int> IDs = FindCompressorByFilter(compressorsmap, CheckByName, name);
+	if (IDs.size() != 0) {
+		Compressor::Header();
+		for (int id:IDs) {
+			cout << compressorsmap.at(id);
+		}
+		return IDs;
+	}
+	else {
+		cout << "По данному фильтру ничего не найдено\n";
+		return {};
+	}
+}
+vector <int> FindAllKSByWorkshopsOutWork(const unordered_map <int, Compressor>& compressorsmap) {
+	int min, max;
+	cout << "Введите интервал в процентах незадействованных цехов\n";
+	do
+	{
+		cout << "min: ";
+		min = EnterUDouble();
+		cout << "max: ";
+		max = EnterUDouble();
+		if ((min > max) && ((min >= 0) && (min <= 100)) && ((max >= 0) && (max <= 100)))
+			cout << "Минимальное должно быть больше чем максимальное и они должны быть от 0 до 100\n";
+	} while (min > max);
+
+
+	pair <double, double> border;
+	border.first = min;
+	border.second = max;
+
+
+	auto IDs = FindCompressorByFilter(compressorsmap, CheckByWorkshopsOutWork, border);
+	return IDs;
+
+}
+
+
+vector <int> FindSomeIDs(const vector <int> &IDs) {
+	vector <int> FindIDs;
+	bool entered;
+	int id;
+	do
+	{
+		cout << "Введите Id:\n";
+		id = EnterUInt();
+		if (find(IDs.begin(), IDs.end(), id) != IDs.end()) {
+			if (find(FindIDs.begin(), FindIDs.end(), id) == FindIDs.end()) {
+				FindIDs.push_back(id);
+			}
+			else {
+				cout << "Данный id уже введен,попробуйте другой\n";
+			}
+		}
+		else {
+			cout << "Данного id нет в списке\n";
+		}
+		if (IDs.size() != FindIDs.size())
+		cout << "Продолжить ввод (1) || Выйти (0)\n";
+
+	} while ((IDs.size()!=FindIDs.size()) && EnterBool());
+	return FindIDs;
+}
+vector <int> FindAllPipes(const unordered_map <int, Pipe> &pipesmap) {
+
+	vector <int> IDs;
+
+
+	cout << "Нажмите 1,если нужен поиск по названию или 0,если по признаку\n" << endl;
+
+	if (EnterBool()) {
+		IDs = FindAllPipesByName(pipesmap);
+	}
+	else {
+		vector <int> IDs;
+		IDs = FindAllPipesByRepair(pipesmap);
+	}
+	return IDs;
+}
+
+vector <int> FindAllCompressors(const unordered_map <int, Compressor>& compressorsmap) {
+	vector <int> IDs;
+	cout << "Нажмите 1,если нужен поиск по названию или 0,если по проценту незадействованных цехов\n" << endl;
+	if (EnterBool()) {
+		IDs=FindAllKSByName(compressorsmap);
+	}
+	else {
+		IDs=FindAllKSByWorkshopsOutWork(compressorsmap);
+	}
+	return IDs;
+}
+
+
 
 
 int main() {
@@ -276,7 +337,7 @@ int main() {
 			pipesmap.insert({ p.id, p });
 			cout << "Введена труба со следующими характеристиками:\n";
 			p.Header();
-			p.OutInfo();
+			cout<<p;
 			break;
 		}
 
@@ -286,39 +347,13 @@ int main() {
 			compressorsmap.insert({ compressorsid,comp });
 			cout << "Введена компрессорная станция со следующими характеристиками:\n";
 			comp.Header();
-			comp.OutInfo();
+			cout<<comp;
 			break;
 		}
 		case 3:
-			Seporator();
-			if (pipesmap.size() != 0)
-			{
-				cout << "Трубы\n";
-				Pipe::Header();
-				for (auto& p : pipesmap)
-				{
-					p.second.OutInfo();
-				}
-			}
-			else
-			{
-				cout << "Нет ни одной трубы\n";
-			}
-			Seporator();
-
-			if (compressorsmap.size() != 0) {
-				cout << "Компрессорные станции\n";
-				Compressor::Header();
-				for (auto& c : compressorsmap)
-				{
-					c.second.OutInfo();
-				}
-			}
-			else
-			{
-				cout << "Нет ни одной компрессорной станции\n";
-			}
-			Seporator();
+			ShowAllPipes(pipesmap);
+			ShowAllCompressors(compressorsmap);
+			
 			break;
 
 		case 4: {
@@ -329,7 +364,7 @@ int main() {
 			for (auto id : IDs)
 			{
 				pipesmap[id].Edit();
-				pipesmap[id].OutInfo();
+				cout<<pipesmap[id];
 			}
 			else 
 				cout << "Нет ни одной трубы";
@@ -337,11 +372,9 @@ int main() {
 			break;
 		}
 		case 5:
-			
 			{
 			vector <int> IDs = EnterIDs(compressorsmap);
 			cout << "Отредактированные КС\n";
-			
 			if (IDs.size() != 0)
 				for (auto id : IDs)
 				{	
@@ -351,17 +384,13 @@ int main() {
 				}
 			else
 				cout << "Нет ни одной КС";
-
 			break;
 			}
-
-			break;
-
 		case 6: {
 			cout << "Поиск файла для сохранения\n";
 			string filename = EnterName();
-			SaveInfo(pipesmap, compressorsmap, filename);
-			SaveBuff(pipesmap, compressorsmap, filename);
+			Pipe::SaveBuff(pipesmap, filename);
+			Compressor::SaveBuff(compressorsmap,filename);
 			break;
 		}
 		case 7: {
@@ -369,139 +398,70 @@ int main() {
 			string filename = EnterName();
 			pipesmap.clear();
 			compressorsmap.clear();
-			LoadInfo(pipesmap, compressorsmap, filename);
+			Pipe::LoadInfo(pipesmap, filename);
+			Compressor::LoadInfo(compressorsmap, filename);
 			break; }
 
 		case 8:
 		{
-			cout << "Нажмите 1,если нужен поиск по названию или 0,если по признаку" << endl;
-			
-			if (EnterBool()) {
-
-				string name = EnterName();
-				vector <int> IDs = FindPipeByFilter(pipesmap, CheckByName, name);
-				if (IDs.size() != 0) {
-					Pipe::Header();
-					for (int i = 0; i < IDs.size(); ++i) {
-						pipesmap[IDs[i]].OutInfo();
-					}
-
-
-				}
-				else {
-					cout << "По данному фильтру ничего не найдено";
-				}
-
-			}
-			else {
-
-				cout << "Нажмите 1,если нужен поиск труб в ремонте или 0,если поиск труб в эксплуатации\n";
-				bool repair = EnterBool();
-				vector <int> id = FindPipeByFilter(pipesmap, CheckByRepair, repair);
-				if (id.size() != 0) {
-					Pipe::Header();
-
-					for (int i = 0; i < id.size(); ++i) {
-						pipesmap[id[i]].OutInfo();
-					}
-					cout << "Нажмите 0,чтобы выйти и 1,чтобы отредактировать  трубы\n";
-					
-					if (EnterBool()) {
-						for (int i = 0; i < id.size(); ++i) {
-							pipesmap[id[i]].Edit();
-						}
-					}
-					else 
+			vector <int> IDs=FindAllPipes(pipesmap);
+			if (IDs.size() != 0)
+			{
+				cout << "1.Удалить некоторые трубы\n" << "2.Редактировать некоторые трубы\n" << "Любую клавишу для выхода\n";
+				char choice = _getch();
+				if (choice == '1') {
+					IDs = FindSomeIDs(IDs);
+					for (auto id : IDs)
 					{
-						break;
+						pipesmap.erase(id);
 					}
 				}
-				else {
-					cout << "По данному фильтру ничего не найдено\n";
+				else if (choice == '2')
+				{
+					IDs = FindSomeIDs(IDs);
+					for (auto id : IDs)
+					{
+
+						pipesmap[id].Edit();
+					}
 				}
-
 			}
-
-
 			break;
 
 		}
 
-
-		break;
 		case 9:
-		{
-		cout << "Нажмите 1,если нужен поиск по названию или 0,если по проценту незадействованных цехов" << endl;
-		
-		if (EnterBool()) {
-
-			string name = EnterName();
-			vector <int> id  = FindCompressorByFilter(compressorsmap, CheckByName, name);
-			if (id.size() != 0) {
-				Compressor::Header();
-				for (int i = 0; i < id.size(); ++i) {
-					compressorsmap[id[i]].OutInfo();
-				}
-			}
-			else {
-				cout << "По данному фильтру ничего не найдено";
-			}
-
-		}
-		else  {
-			int min, max;
-			cout << "Введите интервал в процентах незадействованных цехов\n";
-			do
-			{
-				cout << "min: ";
-				min = EnterUDouble();
-				cout << "max: ";
-				max = EnterUDouble();
-				if ((min > max) && ((min >= 0) && (min <= 100)) && ((max >= 0) && (max <= 100)))
-					cout << "Минимальное должно быть больше чем максимальное и они должны быть от 0 до 100\n";
-			} while (min > max);
-
-
-			pair <double,double> border;
-			border.first = min;
-			border.second = max;
-	
-
-			auto IDs = FindCompressorByFilter(compressorsmap, CheckByWorkshopsOutWork, border);
-
-
-			if (IDs.size() != 0) {
-				Compressor::Header();
-				for (int id:IDs) {
-					compressorsmap[id].OutInfo();
-				}
-
-				cout << "Нажмите 0,чтобы выйти и 1,чтобы отредактировать  компрессорные станции\n";
-			
-				if (EnterBool()) {
-					break;
-				}
-				else 
+		{vector <int> IDs = FindAllCompressors(compressorsmap);
+		if (IDs.size() != 0) {
+			cout << "1.Удалить некоторые КС\n" << "2.Редактировать некоторые КС\n" << "Любую клавишу для выхода\n";
+			char choice = _getch();
+			if (choice == '1') {
+				IDs = FindSomeIDs(IDs);
+				for (auto id : IDs)
 				{
-					for (int id : IDs) {
-						compressorsmap[id].Edit();
-					}
+					compressorsmap.erase(id);
 				}
 			}
-			else {
-				cout << "По данному фильтру ничего не найдено";
+			else if (choice == '2')
+			{
+				IDs = FindSomeIDs(IDs);
+				for (auto id : IDs)
+				{
+
+					compressorsmap[id].Edit();
+				}
 			}
 		}
-		
+	
 		break;
 		}
 		case 10: {
 			vector <int> IDs = EnterIDs(pipesmap);
-			cout << "Удалились следующие трубы\n";
+			cout << "Удалились следующие трубы:\n";
 			Pipe::Header();
 			for (auto id : IDs)
 			{
-				pipesmap[id].OutInfo();
+				cout << pipesmap[id];;
 				pipesmap.erase(id);
 			}
 			break
@@ -511,19 +471,25 @@ int main() {
 		case 11:
 		{
 			vector <int> IDs = EnterIDs(compressorsmap);
-			cout << "Удалились следующие КС\n";
+			cout << "Удалились следующие КС:\n";
 			Compressor::Header();
 			for (auto id : IDs)
 			{
-				compressorsmap[id].OutInfo();
+				cout << compressorsmap[id];
 				compressorsmap.erase(id);
 			}
 			break
 				;
 		}
-		case 12:
+		case 12: {
+			cout << "Поиск файла для сохранения\n";
+			string filename = EnterName();
+			Pipe::SaveInfo(pipesmap, filename);
+			Compressor::SaveInfo(compressorsmap, filename);
+			break;
+		}
+		case 13:
 			return 0;
-
 		default:
 			break;
 		}
