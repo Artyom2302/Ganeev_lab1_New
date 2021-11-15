@@ -1,5 +1,9 @@
 #pragma once
-#include "main.h"
+#include <unordered_map>
+#include <string>
+#include <iostream>
+#include <iomanip>
+#include <fstream>
 using namespace std;
 class Pipe
 {
@@ -12,7 +16,6 @@ public:
 	double length;
 	bool repair;
 	Pipe();
-	Pipe(int id);
 	void Edit();
 	void static Header(ostream& out=cout );
 	void friend operator << (ostream& out,const Pipe &p);

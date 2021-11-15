@@ -46,7 +46,7 @@ istream& operator>>(istream& in, Compressor& c)
 	do
 	{
 		getline(cin, value);
-		if (!(CheckDouble(value) && stod(value) <= 100 && stod(value) >= 0))
+		if (!(CheckDouble(value) && stod(value) <=+ 100 && stod(value) >= 0))
 		{
 			cout << "¬ведите значение верно !!! Ёффективность:  ";
 		}
@@ -388,6 +388,7 @@ int main() {
 		case 2: {
 			
 			Compressor comp;
+			cin >> comp;
 			compressorsmap.insert({ comp.id,comp });
 			cout << "¬ведена компрессорна€ станци€ со следующими характеристиками:\n";
 			comp.Header();
