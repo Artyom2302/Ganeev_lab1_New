@@ -1,43 +1,9 @@
 #include "Compressor.h"
-Compressor::Compressor() :id(0), name(), workshops(), workshopsinwork(), performance(){
+
+unsigned int Compressor::maxid = 0;
+Compressor::Compressor() :id(++maxid), name(), workshops(), workshopsinwork(), performance(){
 }
 
-Compressor::Compressor(int compressorid):id(compressorid), name(), workshops(), workshopsinwork(), performance() {
-
-	string value;
-
-	cout << "Компрессорная станция\nID №" << id << endl;
-	name = EnterName();
-
-
-	cout << "Введите общее количество цехов: ";
-	workshops = EnterUInt();
-
-	cout << "Введите  количество цехов в работе: ";
-	do
-	{
-		getline(cin, value);
-		if (!((CheckInt(value) && (stoi(value) <= workshops)) || value == "0"))
-		{
-			cout << "Введите целочисленное число,не превышающее общее количество цехов!!!\n";
-		}
-
-	} while (!((CheckInt(value) && (stoi(value) <= workshops)) || value == "0"));
-	workshopsinwork = stoi(value);
-
-
-	cout << endl << "Введите эффективность в %: ";
-	do
-	{
-		getline(cin, value);
-		if (!(CheckDouble(value) && stod(value) <= 100 && stod(value) >= 0))
-		{
-			cout << "Введите значение верно !!! Эффективность:  ";
-		}
-
-	} while (!(CheckDouble(value) && stod(value) <= 100 && stod(value) >= 0));
-	performance = stod(value);	
-}
 
 void Compressor::Edit()
 {
@@ -71,13 +37,14 @@ double Compressor::PercentOfOutWork() const
 	return value * 100;
 }
 
-void operator<<(ostream& out, const Compressor c)
+ostream& operator<<(ostream& out, const Compressor c)
 {
 	out << setw(10) << c.id << setw(20) << c.name << setw(30) << c.workshops << setw(30)
 		<< c.workshopsinwork << setw(20) << c.performance << endl;
+	return out;
 }
 
-void operator>>(istream& in, Compressor& c)
+ifstream& operator >>(ifstream& in, Compressor& c)
 {
 	string str;
 	getline(in, str);
@@ -90,8 +57,10 @@ void operator>>(istream& in, Compressor& c)
 	c.workshopsinwork = stoi(str);
 	getline(in, str);
 	c.performance = stod(str);
-
+	return in;
 }
+
+
 
 void Compressor::SaveInfo(unordered_map<int, Compressor>compressors, string filename)
 {
@@ -131,6 +100,7 @@ void Compressor::LoadInfo(unordered_map<int, Compressor> &compressors, string fi
 	filename += "buff";
 	ifstream in(filename);
 	Compressor compressorbuff;
+	--maxid;
 	if (in.is_open()) {
 		do
 		{
@@ -139,7 +109,7 @@ void Compressor::LoadInfo(unordered_map<int, Compressor> &compressors, string fi
 			if (str == "КС") {
 				in >> compressorbuff;
 				compressors.insert({ compressorbuff.id,compressorbuff });
-
+				++maxid;
 			}
 		} while (str != "");
 	}

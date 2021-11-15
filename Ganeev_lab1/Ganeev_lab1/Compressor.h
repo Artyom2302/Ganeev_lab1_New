@@ -17,8 +17,9 @@ public:
 	void Edit();
 	double PercentOfOutWork() const;
 	void static Header(ostream& out = cout);
-	void friend operator<<(ostream& out, const Compressor c);
-	void friend operator >>(istream& in, Compressor& c);
+	friend ostream& operator<<(ostream& out, const Compressor c);
+	friend ifstream& operator >>(ifstream& in, Compressor& c);
+	friend istream& operator >>(istream& in, Compressor& c);
 	void static SaveInfo(unordered_map <int, Compressor> compressors, string filename);
 	void static SaveBuff(unordered_map <int, Compressor> compressors, string filename);
 	void static LoadInfo(unordered_map <int, Compressor> &compressors, string filename);

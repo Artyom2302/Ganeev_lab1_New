@@ -1,22 +1,11 @@
 #include "Pipe.h"
 
+unsigned int Pipe::Maxid = 0;
 
-Pipe::Pipe():id(0),name(""),length(0),diameter(0),repair(0)
+Pipe::Pipe():id(++Maxid),name(""),length(0),diameter(0),repair(0)
 {
 }
 
-Pipe::Pipe(int pipeid) :id(pipeid),name(),length(), diameter(),repair()
-{
-	string value1;
-	cout << "Труба\nID №" << id << endl;
-	name = EnterName();
-	cout << "Введите длину: ";
-	length = EnterUDouble();
-	cout << endl << "Введите диаметр: ";
-	diameter = EnterUInt();
-	cout << endl << "Введите 1,если труба в ремонте и 0,если в эксплуатации \n";
-	repair = EnterBool();
-}
 
 void Pipe::Edit()
 {
@@ -31,7 +20,8 @@ void operator<<(ostream& out, const Pipe& p)
 	out << setw(10) << p.id << setw(20) << p.name << setw(20) << p.length << setw(20) << p.diameter
 		<< setw(40) << ((p.repair) ? "В ремонте\n" : "В эксплуатации\n");
 }
-void operator>>(istream& in, Pipe& p)
+
+ifstream& operator>>(ifstream& in, Pipe& p)
 {
 	string str;
 	getline(in, str);
@@ -48,7 +38,7 @@ void operator>>(istream& in, Pipe& p)
 
 	getline(in, str);
 	p.repair = stoi(str);
-
+	return in;
 }
 
 void Pipe::SaveInfo(unordered_map<int, Pipe> pipes,string filename)
@@ -83,6 +73,7 @@ void Pipe::LoadInfo(unordered_map<int, Pipe> &pipes, string filename)
 	filename += "buff";
 	ifstream in(filename);
 	Pipe pipebuff;
+	--Maxid;
 	if (in.is_open()) {
 		do
 		{
@@ -90,6 +81,7 @@ void Pipe::LoadInfo(unordered_map<int, Pipe> &pipes, string filename)
 			if (str == "Труба") {
 				in >> pipebuff;
 				pipes.insert({ pipebuff.id,pipebuff });
+				++Maxid;
 			}
 		} while (str != "");
 	}

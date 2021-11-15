@@ -6,7 +6,7 @@
 using namespace std;
 
 
-void Seporator(ostream& out = cout) {//
+void Seporator(ostream& out = cout) {
 	for (size_t i = 0; i < 25; i++)
 	{
 		out << "----";
@@ -19,8 +19,56 @@ void Seporator(ostream& out = cout) {//
 int RandomId() {
 	return rand();
 }
+istream& operator>>(istream& in, Compressor& c)
+{
+	string value;
+	cout << "Компрессорная станция\nID №" << c.id << endl;
+	c.name = EnterName();
 
 
+	cout << "Введите общее количество цехов: ";
+	c.workshops = EnterUInt();
+
+	cout << "Введите  количество цехов в работе: ";
+	do
+	{
+		getline(cin, value);
+		if (!((CheckInt(value) && (stoi(value) <= c.workshops)) || value == "0"))
+		{
+			cout << "Введите целочисленное число,не превышающее общее количество цехов!!!\n";
+		}
+
+	} while (!((CheckInt(value) && (stoi(value) <= c.workshops)) || value == "0"));
+	c.workshopsinwork = stoi(value);
+
+
+	cout << endl << "Введите эффективность в %: ";
+	do
+	{
+		getline(cin, value);
+		if (!(CheckDouble(value) && stod(value) <= 100 && stod(value) >= 0))
+		{
+			cout << "Введите значение верно !!! Эффективность:  ";
+		}
+
+	} while (!(CheckDouble(value) && stod(value) <= 100 && stod(value) >= 0));
+	c.performance = stod(value);
+	return in;
+}
+
+istream& operator >>(istream& in, Pipe& p)
+{
+	string value1;
+	cout << "Труба\nID №" << p.id << endl;
+	p.name = EnterName();
+	cout << "Введите длину: ";
+	p.length = EnterUDouble();
+	cout << endl << "Введите диаметр: ";
+	p.diameter = EnterUInt();
+	cout << endl << "Введите 1,если труба в ремонте и 0,если в эксплуатации \n";
+	p.repair = EnterBool();
+	return in;
+}
 
 
 
@@ -100,7 +148,6 @@ vector <int> FindCompressorByFilter(const unordered_map <int, Compressor> &compr
 
 vector <int> EnterIDs(const unordered_map <int, Pipe>& pipesmap) {
 	vector <int> IDs;
-	bool next;
 	do
 	{
 		cout <<"Введите Id: \n";
@@ -128,7 +175,7 @@ vector <int> EnterIDs(const unordered_map <int, Pipe>& pipesmap) {
 
 vector <int> EnterIDs(const unordered_map <int, Compressor>& compressorsmap) {
 	vector <int> IDs;
-	bool next;
+	
 	do
 	{
 		cout << "Введите Id: \n";
@@ -264,7 +311,6 @@ vector <int> FindAllKSByWorkshopsOutWork(const unordered_map <int, Compressor>& 
 
 vector <int> FindSomeIDs(const vector <int> &IDs) {
 	vector <int> FindIDs;
-	bool entered;
 	int id;
 	do
 	{
@@ -298,7 +344,6 @@ vector <int> FindAllPipes(const unordered_map <int, Pipe> &pipesmap) {
 		IDs = FindAllPipesByName(pipesmap);
 	}
 	else {
-		vector <int> IDs;
 		IDs = FindAllPipesByRepair(pipesmap);
 	}
 	return IDs;
@@ -321,8 +366,7 @@ vector <int> FindAllCompressors(const unordered_map <int, Compressor>& compresso
 
 int main() {
 	setlocale(LC_CTYPE, "Russian");
-	
-	int compressorsid = 0, pipesid = 0;
+
 	unordered_map <int, Pipe> pipesmap;
 	unordered_map <int, Compressor> compressorsmap;
 	while (true)
@@ -332,8 +376,8 @@ int main() {
 		{
 		case 1:
 		{
-			pipesid += 1;
-			Pipe p(pipesid);
+			Pipe p;
+			cin >> p;
 			pipesmap.insert({ p.id, p });
 			cout << "Введена труба со следующими характеристиками:\n";
 			p.Header();
@@ -342,9 +386,9 @@ int main() {
 		}
 
 		case 2: {
-			compressorsid += 1;
-			Compressor comp(compressorsid);
-			compressorsmap.insert({ compressorsid,comp });
+			
+			Compressor comp;
+			compressorsmap.insert({ comp.id,comp });
 			cout << "Введена компрессорная станция со следующими характеристиками:\n";
 			comp.Header();
 			cout<<comp;
@@ -407,7 +451,7 @@ int main() {
 			vector <int> IDs=FindAllPipes(pipesmap);
 			if (IDs.size() != 0)
 			{
-				cout << "1.Удалить некоторые трубы\n" << "2.Редактировать некоторые трубы\n" << "Любую клавишу для выхода\n";
+				cout << "1.Удалить некоторые трубы\n" << "2.Редактировать некоторые трубы\n"<<"3.Удалить всё\n" << "Любую клавишу для выхода\n";
 				char choice = _getch();
 				if (choice == '1') {
 					IDs = FindSomeIDs(IDs);
@@ -425,6 +469,11 @@ int main() {
 						pipesmap[id].Edit();
 					}
 				}
+				else if (choice == '3') {
+					for (auto id : IDs) {
+						pipesmap.erase(id);
+					}
+				}
 			}
 			break;
 
@@ -433,7 +482,7 @@ int main() {
 		case 9:
 		{vector <int> IDs = FindAllCompressors(compressorsmap);
 		if (IDs.size() != 0) {
-			cout << "1.Удалить некоторые КС\n" << "2.Редактировать некоторые КС\n" << "Любую клавишу для выхода\n";
+			cout << "1.Удалить некоторые КС\n" << "2.Редактировать некоторые КС\n" <<"3.Удалить всё" << "Любую клавишу для выхода\n";
 			char choice = _getch();
 			if (choice == '1') {
 				IDs = FindSomeIDs(IDs);
@@ -449,6 +498,11 @@ int main() {
 				{
 
 					compressorsmap[id].Edit();
+				}
+			}
+			else if (choice == '3') {
+				for (auto id : IDs) {
+					compressorsmap.erase(id);
 				}
 			}
 		}
