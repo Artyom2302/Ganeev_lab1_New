@@ -15,3 +15,4 @@
 #include "Pipe.h"
 #include "Compressor.h"
 #include <algorithm>
+#include "EGTS.h"

@@ -86,7 +86,9 @@ void MainMenu()
 		"10.Удаление  труб " << endl <<
 		"11.Удаление  КС " << endl <<
 		"12.Вывод на печать " << endl <<
-		"13.Выход" << endl <<
+		"13.Соединить КС и трубами" << endl <<
+		"14.Вывести все соединения" << endl <<
+		"15.Выход" << endl <<
 		"Введите пункт меню: " << endl;
 }
 
@@ -146,62 +148,8 @@ vector <int> FindCompressorByFilter(const unordered_map <int, Compressor> &compr
 }
 
 
-vector <int> EnterIDs(const unordered_map <int, Pipe>& pipesmap) {
-	vector <int> IDs;
-	do
-	{
-		cout <<"Введите Id: \n";
-		int id = EnterUInt();
-		if (FindPipeByFilter(pipesmap, CheckById, id).size()==0)
-		{
-			cout << "Tрубы c данным id нету(Попробуйте другой id)\n";
-		}
-		else
-		{	for (auto ID:IDs)
-				if (id==ID)	
-				{
-				cout<<"Вы уже вводили данный id,попробуйте другой \n";
-				id = 0;
-				}
-		if (id!=0)
-		IDs.push_back(id);
-		}
-			
-		cout << " Продолжить ввод ID?(1-да |0-нет )\n";
-
-	} while (EnterBool() &&	IDs.size()!=pipesmap.size());
-	return IDs;
-}
-
-vector <int> EnterIDs(const unordered_map <int, Compressor>& compressorsmap) {
-	vector <int> IDs;
-	
-	do
-	{
-		cout << "Введите Id: \n";
-		int id = EnterUInt();
-		if (FindCompressorByFilter(compressorsmap, CheckById, id).size() == 0)
-		{
-			cout << "КС c данным id нету(Попробуйте другой id)\n";
-		}
-		else
-		{
-			for (auto ID : IDs)
-				if (id == ID)
-				{
-					cout << "Вы уже вводили данный id,попробуйте другой \n";
-					id = 0;
-				}
-			if (id != 0)
-				IDs.push_back(id);
 
 
-		}
-
-		cout << " Продолжить ввод ID?(1-да |0-нет )\n";
-	} while (EnterBool());
-	return IDs;
-}
 
 void ShowAllPipes(const unordered_map <int, Pipe> &pipes) {
 	Seporator();
@@ -309,7 +257,7 @@ vector <int> FindAllKSByWorkshopsOutWork(const unordered_map <int, Compressor>& 
 }
 
 
-vector <int> FindSomeIDs(const vector <int> &IDs) {
+vector <int> EnterSomeIDs(const vector <int> &IDs) {
 	vector <int> FindIDs;
 	int id;
 	do
@@ -366,9 +314,8 @@ vector <int> FindAllCompressors(const unordered_map <int, Compressor>& compresso
 
 int main() {
 	setlocale(LC_CTYPE, "Russian");
+	EGTS egts;
 
-	unordered_map <int, Pipe> pipesmap;
-	unordered_map <int, Compressor> compressorsmap;
 	while (true)
 	{
 		MainMenu();
@@ -378,7 +325,7 @@ int main() {
 		{
 			Pipe p;
 			cin >> p;
-			pipesmap.insert({ p.id, p });
+			egts.Pipes.insert({ p.id, p });
 			cout << "Введена труба со следующими характеристиками:\n";
 			p.Header();
 			cout<<p;
@@ -389,27 +336,33 @@ int main() {
 			
 			Compressor comp;
 			cin >> comp;
-			compressorsmap.insert({ comp.id,comp });
+			egts.Compressors.insert({ comp.id,comp });
+
 			cout << "Введена компрессорная станция со следующими характеристиками:\n";
 			comp.Header();
 			cout<<comp;
 			break;
 		}
 		case 3:
-			ShowAllPipes(pipesmap);
-			ShowAllCompressors(compressorsmap);
+			ShowAllPipes(egts.Pipes);
+			ShowAllCompressors(egts.Compressors);
 			
 			break;
 
 		case 4: {
-			vector <int> IDs = EnterIDs(pipesmap);
+			vector <int> IDs;
+			for (auto p: egts.Pipes)
+			{
+				IDs.push_back(p.first);
+			}
+				IDs= EnterSomeIDs(IDs);
 			cout << "Отредактированные трубы\n";
 			Pipe::Header();
 			if (IDs.size()!=0)
 			for (auto id : IDs)
 			{
-				pipesmap[id].Edit();
-				cout<<pipesmap[id];
+				egts.Pipes[id].Edit();
+				cout<< egts.Pipes[id];
 			}
 			else 
 				cout << "Нет ни одной трубы";
@@ -418,13 +371,18 @@ int main() {
 		}
 		case 5:
 			{
-			vector <int> IDs = EnterIDs(compressorsmap);
+			vector <int> IDs;
+			for (auto c : egts.Compressors)
+			{
+				IDs.push_back(c.first);
+			}
+				IDs= EnterSomeIDs(IDs);
 			cout << "Отредактированные КС\n";
 			if (IDs.size() != 0)
 				for (auto id : IDs)
 				{	
-					cout << "У компрессорной станции c id "<<id<<" "<< compressorsmap[id].workshopsinwork<< " компрессорных станций в работе\n";
-					compressorsmap[id].Edit();
+					cout << "У компрессорной станции c id "<<id<<" "<< egts.Compressors[id].workshopsinwork<< " компрессорных станций в работе\n";
+					egts.Compressors[id].Edit();
 					
 				}
 			else
@@ -434,45 +392,48 @@ int main() {
 		case 6: {
 			cout << "Поиск файла для сохранения\n";
 			string filename = EnterName();
-			Pipe::SaveBuff(pipesmap, filename);
-			Compressor::SaveBuff(compressorsmap,filename);
+			Pipe::SaveBuff(egts.Pipes, filename);
+			Compressor::SaveBuff(egts.Compressors,filename);
 			break;
 		}
 		case 7: {
 			cout << "Поиск файла для загрузки\n";
 			string filename = EnterName();
-			pipesmap.clear();
-			compressorsmap.clear();
-			Pipe::LoadInfo(pipesmap, filename);
-			Compressor::LoadInfo(compressorsmap, filename);
+			egts.Pipes.clear();
+			egts.Compressors.clear();
+			Pipe::LoadInfo(egts.Pipes, filename);
+			Compressor::LoadInfo(egts.Compressors, filename);
 			break; }
 
 		case 8:
 		{
-			vector <int> IDs=FindAllPipes(pipesmap);
+			vector <int> IDs=FindAllPipes(egts.Pipes);
 			if (IDs.size() != 0)
 			{
 				cout << "1.Удалить некоторые трубы\n" << "2.Редактировать некоторые трубы\n"<<"3.Удалить всё\n" << "Любую клавишу для выхода\n";
 				char choice = _getch();
 				if (choice == '1') {
-					IDs = FindSomeIDs(IDs);
+					IDs = EnterSomeIDs(IDs);
 					for (auto id : IDs)
 					{
-						pipesmap.erase(id);
+						egts.Pipes.erase(id);
+						egts.EGTSDeletePipes(id);
+
 					}
 				}
 				else if (choice == '2')
 				{
-					IDs = FindSomeIDs(IDs);
+					IDs = EnterSomeIDs(IDs);
 					for (auto id : IDs)
 					{
 
-						pipesmap[id].Edit();
+						egts.Pipes[id].Edit();
 					}
 				}
 				else if (choice == '3') {
 					for (auto id : IDs) {
-						pipesmap.erase(id);
+						egts.Pipes.erase(id);
+						egts.EGTSDeletePipes(id);
 					}
 				}
 			}
@@ -481,29 +442,33 @@ int main() {
 		}
 
 		case 9:
-		{vector <int> IDs = FindAllCompressors(compressorsmap);
+		{vector <int> IDs = FindAllCompressors(egts.Compressors);
 		if (IDs.size() != 0) {
-			cout << "1.Удалить некоторые КС\n" << "2.Редактировать некоторые КС\n" <<"3.Удалить всё" << "Любую клавишу для выхода\n";
+			cout << "1.Удалить некоторые КС\n" << "2.Редактировать некоторые КС\n" <<"3.Удалить всё\n" << "Любую клавишу для выхода\n";
 			char choice = _getch();
 			if (choice == '1') {
-				IDs = FindSomeIDs(IDs);
+				IDs = EnterSomeIDs(IDs);
 				for (auto id : IDs)
 				{
-					compressorsmap.erase(id);
+					egts.Compressors.erase(id);
+					egts.EGTSDeleteCompressors(id);
 				}
 			}
 			else if (choice == '2')
 			{
-				IDs = FindSomeIDs(IDs);
+				IDs = EnterSomeIDs(IDs);
 				for (auto id : IDs)
 				{
 
-					compressorsmap[id].Edit();
+					egts.Compressors[id].Edit();
+
+
 				}
 			}
 			else if (choice == '3') {
 				for (auto id : IDs) {
-					compressorsmap.erase(id);
+					egts.Compressors.erase(id);
+					egts.EGTSDeleteCompressors(id);
 				}
 			}
 		}
@@ -511,13 +476,19 @@ int main() {
 		break;
 		}
 		case 10: {
-			vector <int> IDs = EnterIDs(pipesmap);
+			vector <int> IDs;
+			for (auto p : egts.Pipes)
+			{
+				IDs.push_back(p.first);
+			}
+			IDs = EnterSomeIDs(IDs);
 			cout << "Удалились следующие трубы:\n";
 			Pipe::Header();
 			for (auto id : IDs)
 			{
-				cout << pipesmap[id];;
-				pipesmap.erase(id);
+				cout << egts.Pipes[id];;
+				egts.Pipes.erase(id);
+			
 			}
 			break
 				;
@@ -525,13 +496,19 @@ int main() {
 			
 		case 11:
 		{
-			vector <int> IDs = EnterIDs(compressorsmap);
+			vector <int> IDs;
+			for (auto c : egts.Compressors)
+			{
+				IDs.push_back(c.first);
+			}
+			IDs = EnterSomeIDs(IDs);
 			cout << "Удалились следующие КС:\n";
 			Compressor::Header();
 			for (auto id : IDs)
 			{
-				cout << compressorsmap[id];
-				compressorsmap.erase(id);
+				cout << egts.Compressors[id];
+				egts.Compressors.erase(id);
+				
 			}
 			break
 				;
@@ -539,11 +516,19 @@ int main() {
 		case 12: {
 			cout << "Поиск файла для сохранения\n";
 			string filename = EnterName();
-			Pipe::SaveInfo(pipesmap, filename);
-			Compressor::SaveInfo(compressorsmap, filename);
+			Pipe::SaveInfo(egts.Pipes, filename);
+			Compressor::SaveInfo(egts.Compressors, filename);
 			break;
 		}
 		case 13:
+		{	
+			EGTS::Branch branch = egts.CreateBranch();
+			break;
+		}
+		case 14:
+				egts.OutBranchesInfo();
+			break;
+		case 15:
 			return 0;
 		default:
 			break;

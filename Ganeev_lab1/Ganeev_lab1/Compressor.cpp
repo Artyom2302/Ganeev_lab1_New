@@ -1,7 +1,7 @@
 #include "Compressor.h"
 
 unsigned int Compressor::maxid = 0;
-Compressor::Compressor() :id(++maxid), name(), workshops(), workshopsinwork(), performance(){
+Compressor::Compressor() :id(++maxid), name(), workshops(), workshopsinwork(), performance(), connectedpipe({}) {
 }
 
 

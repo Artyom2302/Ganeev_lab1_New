@@ -1,5 +1,11 @@
 #pragma once
-#include "main.h"
+#include <unordered_map>
+#include <string>
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+#include "EnterValue.h"
+#include <set>
 using namespace std;
 class Compressor {
 	static unsigned int  maxid;
@@ -10,10 +16,10 @@ public:
 	unsigned int workshops ;
 	unsigned int workshopsinwork;
 	double performance ;
-	
 
+	set <int> connectedpipe;
 	Compressor();
-	Compressor(int compressorid);
+	
 	void Edit();
 	double PercentOfOutWork() const;
 	void static Header(ostream& out = cout);
