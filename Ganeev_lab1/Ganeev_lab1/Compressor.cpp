@@ -62,60 +62,9 @@ ifstream& operator >>(ifstream& in, Compressor& c)
 
 
 
-void Compressor::SaveInfo(unordered_map<int, Compressor>compressors, string filename)
-{
-	ofstream fout;
-	fout.open(filename,ios::app);
-	fout << "\nКомпрессорные станции\n";
-	Header(fout);
-	for (auto& c : compressors)
-	{
-		fout << c.second;
-	}
-	fout.close();
-	
-}
-
-void Compressor::SaveBuff(unordered_map<int, Compressor> compressors, string filename)
-{
-	ofstream fbuff;
-	filename += "buff";
-	fbuff.open(filename,ios::app);
-
-	for (auto& c : compressors) {
-		fbuff << "КС\n" << c.second.id << endl << c.second.name << endl << c.second.workshops << endl
-			<< c.second.workshopsinwork << endl << c.second.performance << endl;
-	}
-		
-	fbuff.close();
-}
 
 
 
 
 
-void Compressor::LoadInfo(unordered_map<int, Compressor> &compressors, string filename)
-{
-	string str;
-	filename += "buff";
-	ifstream in(filename);
-	Compressor compressorbuff;
-	--maxid;
-	if (in.is_open()) {
-		do
-		{
-			getline(in, str);
 
-			if (str == "КС") {
-				in >> compressorbuff;
-				compressors.insert({ compressorbuff.id,compressorbuff });
-				++maxid;
-			}
-		} while (str != "");
-	}
-	else {
-		cout << "Такого файла не существует!!!";
-	}
-	in.close();
-
-}

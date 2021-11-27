@@ -41,54 +41,8 @@ ifstream& operator>>(ifstream& in, Pipe& p)
 	return in;
 }
 
-void Pipe::SaveInfo(unordered_map<int, Pipe> pipes,string filename)
-{
-	ofstream fout;
-	fout.open(filename);
-	fout << "Общая информация\n";
-	fout << "Трубы\n";
-	Header(fout);
-	for (auto& p : pipes)
-	{
-		fout << p.second;
-	}
-	fout.close();
-}
 
-void Pipe::SaveBuff(unordered_map<int, Pipe> pipes, string filename)
-{
-	ofstream fbuff;
-	filename += "buff";
-	fbuff.open(filename);
-	for (auto& p : pipes) {
-		fbuff << "Труба\n" << p.second.id << endl << p.second.name << endl << p.second.length << endl << p.second.diameter << endl << p.second.repair << endl;
-	}
-	fbuff.close();
 
-}
-
-void Pipe::LoadInfo(unordered_map<int, Pipe> &pipes, string filename)
-{
-	string str;
-	filename += "buff";
-	ifstream in(filename);
-	Pipe pipebuff;
-	--Maxid;
-	if (in.is_open()) {
-		do
-		{
-			getline(in, str);
-			if (str == "Труба") {
-				in >> pipebuff;
-				pipes.insert({ pipebuff.id,pipebuff });
-				++Maxid;
-			}
-		} while (str != "");
-	}
-	else 
-		cout << "Такого файла не существует!!!";
-	in.close();
-}
 
 
 

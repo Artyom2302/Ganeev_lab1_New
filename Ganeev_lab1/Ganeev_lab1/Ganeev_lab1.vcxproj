@@ -88,6 +88,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -116,6 +118,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -141,6 +145,7 @@
   <ItemGroup>
     <ClCompile Include="Check.cpp" />
     <ClCompile Include="Compressor.cpp" />
+    <ClCompile Include="EGTS.cpp" />
     <ClCompile Include="EnterValue.cpp" />
     <ClCompile Include="Pipe.cpp" />
     <ClCompile Include="main.cpp" />
@@ -148,6 +153,7 @@
   <ItemGroup>
     <ClInclude Include="Check.h" />
     <ClInclude Include="Compressor.h" />
+    <ClInclude Include="EGTS.h" />
     <ClInclude Include="EnterValue.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="Pipe.h" />
