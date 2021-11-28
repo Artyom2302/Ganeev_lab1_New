@@ -15,6 +15,10 @@ void Pipe::Edit()
 void Pipe::Header(ostream &out) {
 	out << setw(10) << "Id " << setw(20) << "Название" << setw(20) << "Длина" << setw(20) << "Диаметр" << setw(40) << "Состояние(В ремонте или нет)\n";
 }
+void Pipe::nullmaxid()
+{
+	Maxid = 0;
+}
 void operator<<(ostream& out, const Pipe& p)
 {
 	out << setw(10) << p.id << setw(20) << p.name << setw(20) << p.length << setw(20) << p.diameter

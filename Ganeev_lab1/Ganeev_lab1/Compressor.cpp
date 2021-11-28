@@ -28,6 +28,11 @@ void Compressor::Header(ostream&out)
 		<< setw(30) << "Количество цехов в работе" << setw(20) << "Эффективность" << endl;
 }
 
+void Compressor::nullmaxid()
+{
+	maxid = 0;
+}
+
 
 double Compressor::PercentOfOutWork() const
 {

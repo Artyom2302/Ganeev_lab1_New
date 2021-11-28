@@ -213,8 +213,8 @@ void EGTS::LoadInfo(string filename) {
 	string str;
 	filename += "buff";
 	ifstream in(filename);
-	
-
+	Pipe::nullmaxid();
+	Compressor::nullmaxid();
 	if (in.is_open()) {
 		do
 		{
@@ -483,14 +483,14 @@ EGTS::Branch EGTS::CreateBranch()
 		{
 			cout << "Введите id КС,куда нужно доставить газ\n";
 			outcompid = EnterUInt();
-			if (Compressors.find(incompid) == Compressors.end()) {
+			if (Compressors.find(outcompid) == Compressors.end()) {
 				cout << "Данной КС не существует\n";
 			}
 			if (incompid == outcompid) {
 				cout << "Вы уже вводили данный Id \n";
 			}
 
-		} while (Compressors.find(incompid) == Compressors.end() || incompid == outcompid);
+		} while (Compressors.find(outcompid) == Compressors.end() || incompid == outcompid);
 
 		do
 		{
@@ -532,7 +532,7 @@ void EGTS::OutBranchesInfo()
 {
 	if (Branches.size() != 0) {
 	for (auto& branch : Branches) {
-		Connection(branch.inid, branch.pid, branch.outid);
+		Connection(branch.fromid, branch.pid, branch.toid);
 	}
 	}
 	else
@@ -565,7 +565,7 @@ void EGTS::SaveBranches()
 	ofstream fout;
 	fout.open("EGTS");
 	for (auto& branch : Branches) {
-		fout << branch.inid<<endl << branch.pid << endl << branch.outid << endl;
+		fout << branch.fromid<<endl << branch.pid << endl << branch.toid << endl;
 	}
 	fout.close();
 }
@@ -576,15 +576,16 @@ void EGTS::LoadBranches()
 	string value;
 	Branch branch;
 
-	if (fin.is_open()) {
+	if (fin.is_open()&&!fin.eof()) {
 		getline(fin, value);
 		do
+
 		{
-			branch.inid = stoi(value);
+			branch.fromid = stoi(value);
 			getline(fin, value);
 			branch.pid = stoi(value);
 			getline(fin, value);
-			branch.outid = stoi(value);
+			branch.toid = stoi(value);
 			Branches.push_back(branch);
 			getline(fin, value);
 		} while (value!="");
@@ -592,46 +593,7 @@ void EGTS::LoadBranches()
 	
 	
 }
-void EGTS::CreateGraphTable()
-{
-	vector <vector <int>> Table;
-	Table.reserve(Compressors.size());
-	for (size_t i = 0; i < Compressors.size() - 1; i++)
-	{
-		Table.push_back({});
-		Table[i].reserve(Compressors.size());
-	}
-	unordered_map <int, Compressor>::iterator KSiter = Compressors.begin();
 
-	for (size_t i = 0; i < Compressors.size() - 1; i++)
-	{
-		set <int> compid = findBranches(&Branch::inid, KSiter->first);
-		set<int>::iterator  IDiter = compid.begin();
-		KSiter++;
-		vector <int> line;
-		for (size_t j = 0; j < Compressors.size() - 1; j++)
-		{
-			line = {};
-			line.reserve(Compressors.size());
-			if (j != i) {
-				if (Branches[*IDiter].pid != 0)
-				{
-					line.push_back(1);
-				}
-				else {
-					line.push_back(0);
-				}
-			}
-			else
-			{
-				line.push_back(0);
-			}
-			IDiter++;
-		}
-		Table.push_back(line);
-	}
-
-}
 void EGTS::Connection(int in, int pid, int out)
 {	
 	if (in != 0 && pid != 0 && out != 0) {
@@ -648,12 +610,12 @@ void EGTS::DisconnectPipe(int id) {
 	}
 };
 void EGTS::DisconnectKS(int id) {
-	set <int>	branchesid = findBranches(&Branch::inid, id);
+	set <int>	branchesid = findBranches(&Branch::fromid, id);
 	for (auto& id : branchesid)
 	{
 		Branches.erase(Branches.begin() + id);
 	}
-	branchesid = findBranches(&Branch::outid, id);
+	branchesid = findBranches(&Branch::toid, id);
 	for (auto& id : branchesid)
 	{
 		Branches.erase(Branches.begin() + id);
@@ -666,7 +628,7 @@ void EGTS::DeletePipe(int id)
 	if (branchesid.size() != 0) {
 		cout << "Данная труба состоит в газотранспортной сети в следующих связах:\n";
 		for (auto& id : branchesid) {
-			Connection(Branches[id].inid, Branches[id].pid, Branches[id].outid);
+			Connection(Branches[id].fromid, Branches[id].pid, Branches[id].toid);
 		}
 		cout << "Вы уверены,что хотите отсоединить труб0у и удалить все связи(1-Да//0-Нет)\n";
 		if (EnterBool()) {
@@ -679,15 +641,15 @@ void EGTS::DeletePipe(int id)
 }
 void EGTS::DeleteKS(int id)
 {
-	set<int> branchesinid = findBranches(&Branch::inid, id);
-	set<int> branchesoutid = findBranches(&Branch::outid, id);
+	set<int> branchesinid = findBranches(&Branch::fromid, id);
+	set<int> branchesoutid = findBranches(&Branch::toid, id);
 	if (branchesinid.size() != 0 ||branchesoutid.size()!=0) {
 		cout << "Данная КС состоит в газотранспортной сети в следующих связах:\n";
 		for (auto& id : branchesinid) {
-			Connection(Branches[id].inid, Branches[id].pid, Branches[id].outid);
+			Connection(Branches[id].fromid, Branches[id].pid, Branches[id].toid);
 		}
 		for (auto& id : branchesoutid) {
-			Connection(Branches[id].inid, Branches[id].pid, Branches[id].outid);
+			Connection(Branches[id].fromid, Branches[id].pid, Branches[id].toid);
 		}
 		cout << "Вы уверены,что хотите отсоединить КС и удалить все связи(1-Да//0-Нет)\n";
 		if (EnterBool()) {
@@ -713,8 +675,211 @@ void EGTS::DeleteCompressors(vector <int> IDs)
 		DeleteKS(id);
 	}
 }
+vector <vector <int>> EGTS::CreateCmeshTable()
+{
+	vector <vector <int>> SmeschTable;
+	SmeschTable.reserve(Compressors.size());
+	for (size_t i = 0; i < Compressors.size(); i++)
+	{
+		SmeschTable.push_back({});
+		SmeschTable[i].reserve(Compressors.size());
+		for (int j = 0; j < Compressors.size(); ++j) {
+			SmeschTable[i].push_back(0);
+		}
+	}
+	
+	/*int i = 0;
+	for (auto& compressor : Compressors) {
+		pair <int, int> idandindex;
+		idandindex.first = compressor.first;
+		idandindex.second = i++;
+		idtoindex.insert(idandindex);
+	}*/
+	set <int> KSids;
+	for (auto& compressor : Compressors) {
+		KSids.insert(compressor.first);
+	}
+
+	set <int> ::iterator iterini = KSids.begin();
+	for (int i = 0; i < Compressors.size(); ++i) {
+		
+		set<int > branchesindex= findBranches(&Branch::fromid, *iterini);
+		set <int> ::iterator iterinj = KSids.begin();
+		for (int j = 0; j < Compressors.size(); ++j) {
+			
+			for (auto index:branchesindex)
+			{
+				if (Branches[index].toid == *iterinj) {
+					SmeschTable[i][j] = 1;
+					break;
+				
+				}
+				else {
+					SmeschTable[i][j] = 0;
+				}
+			}
+				++iterinj;
+		}
+		++iterini;
+
+	}
+	
+
+	
+	
+	return SmeschTable;
 
 
 
+}
+
+vector <vector <int>> EGTS::CreateDostichimostTable(const vector <vector <int>>& Smesch) {
+	vector <vector <int>> mass;
+	mass = Smesch;
+
+	for (size_t i = 0; i < mass.size(); i++)
+	{
+		for (size_t j = 0; j < mass.size(); j++)
+		{
+
+			if (i != j) {
+				if (mass[i][j] == 1) {
+					for (size_t k = 0; k < mass.size(); k++)
+					{
+						if (mass[j][k] == 1) {
+							mass[i][k] = 1;
+						}
+					}
+				}
+			}
+			else {
+				mass[i][j] = 1;
+			}
+		
+
+		}
+	}
+	return mass;
+
+};
 
 
+vector <vector <int>> EGTS::CreateIncedentTable(unordered_map<int, Compressor> Compressors) {
+	vector <vector <int>> mass;
+	mass.reserve(Compressors.size());
+	for (size_t i = 0; i < Compressors.size(); i++)
+	{
+		mass.push_back({});
+		mass[i].reserve(Branches.size());
+		for (int j = 0; j < Branches.size(); ++j) {
+			mass[i].push_back(0);
+		}
+	}
+
+	set <int> KSids;
+	for (auto& compressor : Compressors) {
+		KSids.insert(compressor.first);
+	}
+	
+	for (size_t j = 0; j <Branches.size() ; j++)
+	{
+		set <int>::iterator iter = KSids.begin();
+		set <int> branchesids = findBranches(&Branch::pid, Branches[j].pid);
+		for (size_t i = 0; i < Compressors.size(); i++)
+		{
+			
+			for (auto id:branchesids)
+			{
+				if (Branches[id].fromid == *iter) {
+					mass[i][j] = 1;
+					break;
+				}
+				else if (Branches[id].toid == *iter) {
+					mass[i][j] = -1;
+					break;
+				}
+				else {
+					mass[i][j] = 0;
+				}
+			}
+			++iter;
+
+		}
+	}
+
+	return mass;
+
+};
+bool EGTS::CheckCycle(vector<vector<int>> Dostichimost)
+{
+	for (size_t i = 0; i < Dostichimost.size(); i++)
+	{
+		for (size_t j = 0; j < Dostichimost[i].size(); j++)
+		{
+			if (Dostichimost[i][j] == Dostichimost[j][i] && i!=j) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+void EGTS::TopologicalSort()
+{
+	
+	if (CheckCycle(CreateDostichimostTable(CreateCmeshTable()))) {
+		cout << "Топологическая сортировка не возможна, так как есть цикл\n";
+	}
+	else
+	{
+		for (auto &[id,comp]:Compressors)
+		{
+			SortKSnumber.emplace(id, 1);
+		}	
+		SaveBuff("Data");
+		SaveBranches();
+		int count = Compressors.size();
+		for (size_t i = 0; i <count ; i++)
+		{
+		
+			multimap <int, int> KSandOutPower;
+			vector <int> outpower;
+			for (auto& KS : Compressors)
+			{
+				KSandOutPower.emplace(OutPower(KS.first),KS.first);
+			}
+			
+			DisconnectKS(KSandOutPower.begin()->second);
+			SortKSnumber[KSandOutPower.begin()->second] = count-i;
+			Compressors.erase(KSandOutPower.begin()->second);
+		};
+		LoadInfo("Data");
+		LoadBranches();
+		cout << "Результат топологической сортировки: \n\n";
+
+		map<int,int> SortnumberKS;
+		for (auto& elem: SortKSnumber) {
+			SortnumberKS.emplace(elem.second, elem.first);
+		}
+		for (auto& elem : SortKSnumber) {
+			cout << "КС id №" << elem.second << "(" << elem.first << ")" << "--->" << endl;
+		}
+	
+
+	
+
+	}
+	
+	
+	
+
+
+}
+
+int EGTS::OutPower(int compid)
+{
+
+	set <int> ids=findBranches(&Branch::fromid, compid);
+	return ids.size();
+}

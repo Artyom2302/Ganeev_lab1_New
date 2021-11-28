@@ -106,14 +106,37 @@ int main() {
 		}
 		case 13:
 		{	
-			EGTS::Branch branch = egts.CreateBranch();
+EGTS::Branch branch = egts.CreateBranch();
 			break;
 		}
 		case 14:
-				egts.OutBranchesInfo();
-			/*	egts.CreateGraphTable();*/
-			break;
+		{egts.OutBranchesInfo();
+		vector <vector <int>> massiv = egts.CreateCmeshTable();
+		for (size_t i = 0; i < massiv.size(); i++)
+		{
+			for (size_t j = 0; j < massiv.size(); j++)
+			{
+				cout << massiv[i][j] << " ";
+			}
+			cout << endl;
+		}
+		cout << endl << endl;
+		massiv = egts.CreateDostichimostTable(massiv);
+		for (size_t i = 0; i < massiv.size(); i++)
+		{
+			for (size_t j = 0; j < massiv.size(); j++)
+			{
+				cout << massiv[i][j] << " ";
+			}
+			cout << endl;
+		}
+		cout << endl << endl;
+		
+		egts.TopologicalSort();
+
+		break; }
 		case 15:
+			egts.SaveBuff("Data");
 			egts.SaveBranches();
 			break;
 		case 16:

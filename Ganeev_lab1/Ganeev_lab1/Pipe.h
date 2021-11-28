@@ -16,6 +16,7 @@ public:
 	double length;
 	bool repair;
 	Pipe();
+	
 	void Edit();
 	void static Header(ostream& out=cout );
 	void friend operator << (ostream& out,const Pipe &p);
@@ -23,6 +24,6 @@ public:
 	friend ifstream& operator>>(ifstream& in, Pipe& p);
 	void static SaveBuff(unordered_map <int, Pipe> pipes, string filename);
 	void static LoadInfo(unordered_map <int, Pipe> &pipes, string filename);
-
+	void static nullmaxid();
 };
 

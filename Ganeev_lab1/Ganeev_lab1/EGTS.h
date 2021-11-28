@@ -4,19 +4,20 @@
 #include "Compressor.h"
 #include "EnterValue.h"
 #include <set>
+#include <algorithm>
+#include <map>
 
 class EGTS
 {	
 
 	unordered_map <int, Pipe > Pipes;
 	unordered_map <int, Compressor> Compressors;
-	
+	unordered_map <int, int> SortKSnumber;
 public :
 
-	
 	struct Branch
 	{
-		int pid, inid, outid;
+		int pid, fromid, toid;
 	};
 	vector	<Branch> Branches;
 	EGTS();	
@@ -55,7 +56,7 @@ public :
 
 	 //Вторая лабораторная работа --конец
 
-
+	 //Третья лаюораторная работа
 	 
 
 	Branch CreateBranch();
@@ -66,14 +67,23 @@ public :
 	void Connection(int in, int pid, int out);	
 	void SaveBranches();
 	void LoadBranches();
-	void CreateGraphTable();
 	void DisconnectPipe(int id);
 	void DisconnectKS(int id);
 	void DeletePipe(int id);
 	void DeleteKS(int id);
 	void DeletePipes(vector <int> IDs);
 	void DeleteCompressors(vector <int> IDs);
+	vector <vector <int>> CreateCmeshTable();
+	vector <vector <int>> CreateDostichimostTable(const vector <vector <int>> &Smeschnost);
+	vector <vector <int>> CreateIncedentTable(unordered_map <int, Compressor> KSS);
 	
+	int OutPower(int compid);
+
+	bool CheckCycle(vector <vector <int>> Dostichimost);
+	void TopologicalSort();
+	
+
+	//Третья лабораторная работа 
 
 
 };

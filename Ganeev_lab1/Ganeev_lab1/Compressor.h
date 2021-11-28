@@ -26,5 +26,5 @@ public:
 	friend ostream& operator<<(ostream& out, const Compressor c);
 	friend ifstream& operator >>(ifstream& in, Compressor& c);
 	friend istream& operator >>(istream& in, Compressor& c);
-	
+	void static nullmaxid();
 };
