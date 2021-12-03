@@ -6,20 +6,21 @@
 #include <set>
 #include <algorithm>
 #include <map>
+#include <unordered_set>
 
 class EGTS
 {	
 
 	unordered_map <int, Pipe > Pipes;
 	unordered_map <int, Compressor> Compressors;
-	unordered_map <int, int> SortKSnumber;
+	 map <int, int> SortnumberKS;
 public :
 
 	struct Branch
 	{
 		int pid, fromid, toid;
 	};
-	vector	<Branch> Branches;
+	unordered_map <int,Branch> Branches;
 	EGTS();	
 	void  static Diviner(ostream& out = cout);
 	//Первая лабораторная работа--начало
@@ -60,7 +61,7 @@ public :
 	 
 
 	Branch CreateBranch();
-	set<int> findBranches(int Branch::*field, int parametr);
+	set<int> findBranches(unordered_map <int, Branch>Branches,int Branch::*field, int parametr);
 	vector <int> AllPipeIDs()const;
 	vector <int> AllKSIDs()const;
 	void OutBranchesInfo();
@@ -73,7 +74,7 @@ public :
 	void DeleteKS(int id);
 	void DeletePipes(vector <int> IDs);
 	void DeleteCompressors(vector <int> IDs);
-	vector <vector <int>> CreateCmeshTable();
+	vector <vector <int>> CreateCmeshTable(bool weight = false);
 	vector <vector <int>> CreateDostichimostTable(const vector <vector <int>> &Smeschnost);
 	vector <vector <int>> CreateIncedentTable(unordered_map <int, Compressor> KSS);
 	
@@ -84,7 +85,9 @@ public :
 	
 
 	//Третья лабораторная работа 
-
+	//Четвертая лабораторная работа 
+	void SearchShortWay();
+	//Четвертая лабораторная работа 
 
 };
 

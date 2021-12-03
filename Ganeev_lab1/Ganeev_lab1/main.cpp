@@ -133,6 +133,7 @@ EGTS::Branch branch = egts.CreateBranch();
 		cout << endl << endl;
 		
 		egts.TopologicalSort();
+		egts.SearchShortWay();
 
 		break; }
 		case 15:
