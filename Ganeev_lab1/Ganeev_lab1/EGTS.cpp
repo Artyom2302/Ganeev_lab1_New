@@ -467,7 +467,7 @@ void EGTS::BatchKSEditing()
 EGTS::Branch EGTS::CreateBranch()
 {
 	Branch branch;
-	int pipeid, incompid, outcompid;;
+	int pipeid, incompid, outcompid;
 	if (Branches.size() != Pipes.size()) {
 		do
 		{
@@ -483,14 +483,19 @@ EGTS::Branch EGTS::CreateBranch()
 		{
 			cout << "Введите id КС,куда нужно доставить газ\n";
 			outcompid = EnterUInt();
+			if (Compressors.size() < 2) {
+				cout << "КС для подключения больше нет!!!";
+				return {};
+			}
 			if (Compressors.find(outcompid) == Compressors.end()) {
 				cout << "Данной КС не существует\n";
 			}
 			if (incompid == outcompid) {
 				cout << "Вы уже вводили данный Id \n";
 			}
+			
 
-		} while (Compressors.find(outcompid) == Compressors.end() || incompid == outcompid);
+		} while (Compressors.find(outcompid) == Compressors.end() || incompid == outcompid||Compressors.size()<2);
 
 		do
 		{
@@ -508,13 +513,12 @@ EGTS::Branch EGTS::CreateBranch()
 		cout << "Добавлена следующая ветка ";
 		Connection(incompid, pipeid, outcompid);
 		Branches.emplace(pipeid,branch);
-		Compressors[incompid].connectedpipe.insert(pipeid);
-		Compressors[outcompid].connectedpipe.insert(pipeid);
 		return branch;
 	}
 	else
 	{
 		cout << "Нельзя установить больше связей,так как все трубы заняты\n";
+		return {};
 	}
 
 }
@@ -673,7 +677,7 @@ void EGTS::DeleteCompressors(vector <int> IDs)
 		DeleteKS(id);
 	}
 }
-vector <vector <int>> EGTS::CreateCmeshTable(bool weight)
+vector <vector <int>> EGTS::CreateCmeshTable()
 {
 	vector <vector <int>> SmeschTable;
 	SmeschTable.reserve(Compressors.size());
@@ -689,30 +693,12 @@ vector <vector <int>> EGTS::CreateCmeshTable(bool weight)
 	int i = 0;
 	unordered_map <int, int> KSoppIndex;
 	for (auto KS:Compressors)
-	{
+	{	
 		KSoppIndex.emplace(KS.first,i);
 		++i;
 	}
 	i = 0;
-	if (weight) {
-		for (auto KS : Compressors)
-		{
-			set<int> ids = findBranches(Branches, &Branch::fromid, KS.first);
-			for (auto branchid : ids) {
-				SmeschTable[i][KSoppIndex[Branches[branchid].toid]] = Pipes[Branches[branchid].pid].length;
-			}
-			++i;
-		}
-		for (size_t i = 0; i < Compressors.size(); i++)
-		{
-			for (int j = 0; j < Compressors.size(); ++j) {
-				if (SmeschTable[i][j] == 0 && i!=j) {
-					SmeschTable[i][j] = 10000;
-				}
-			}
-		}
-	}
-	else {
+	
 		for (auto KS : Compressors)
 		{
 			set<int> ids = findBranches(Branches, &Branch::fromid, KS.first);
@@ -721,7 +707,7 @@ vector <vector <int>> EGTS::CreateCmeshTable(bool weight)
 			}
 			++i;
 		}
-	}
+
 	
 
 	return SmeschTable;
@@ -828,20 +814,16 @@ bool EGTS::CheckCycle(vector<vector<int>> Dostichimost)
 
 	return false;
 }
-
 void EGTS::TopologicalSort()
 {
-	
-	if (CheckCycle(CreateDostichimostTable(CreateCmeshTable()))) {
-		cout << "Топологическая сортировка не возможна, так как есть цикл\n";
-	}
-	else
-	{
+	if( Compressors.size()!=0 || Pipes.size()!=0) {
 		if (CheckCycle(CreateDostichimostTable(CreateCmeshTable()))) {
 			cout << "Топологическая сортировка не возможна, так как есть цикл\n";
+			return ;
 		}
 		else
 		{
+
 			unordered_map <int, Branch>CopyBranch = Branches;
 			unordered_map <int, int> SortKSnumber;
 			set <int> unvisited;
@@ -861,7 +843,7 @@ void EGTS::TopologicalSort()
 					set <int> ids = findBranches(CopyBranch, &Branch::fromid, idKS);
 					KSandOutPower.emplace(ids.size(), idKS);
 				}
-				
+
 				set <int>ids = findBranches(CopyBranch, &Branch::toid, KSandOutPower.begin()->second);
 				for (auto& id : ids) {
 					CopyBranch.erase(id);
@@ -871,22 +853,147 @@ void EGTS::TopologicalSort()
 			};
 			cout << "Результат топологической сортировки: \n\n";
 
-
+			SortnumberKS.clear();
 			for (auto& elem : SortKSnumber) {
 				SortnumberKS.emplace(elem.second, elem.first);
 			}
 			for (auto& elem : SortnumberKS) {
-				cout << "КС id №" << elem.second << "(" << elem.first << ")" << "--->" << endl;
+				set<int> fromids = findBranches(Branches, &Branch::fromid, elem.second);
+				set<int> toids = findBranches(Branches, &Branch::toid, elem.second);
+				if (fromids.size() != 0 || toids.size() != 0) {
+					cout << "КС id №" << elem.second << "(" << elem.first << ")" <<endl;
+				}
+
+			}
+
+			for (auto& elem : SortnumberKS) {
+				set<int> fromids = findBranches(Branches, &Branch::fromid, elem.second);
+				set<int> toids = findBranches(Branches, &Branch::toid, elem.second);
+				if (fromids.size() == 0 && toids.size() == 0) {
+					cout << "- x ->" << "КС id №" << elem.second << "(" << elem.first << ")" << "- x ->" << endl;
+				}
+			}
+			return;
+		}
+
+
+
+
+	}
+		
+	else {
+		cout << "Нечего сортировать!!!\n";
+		return;
+	}
+}
+
+void EGTS::FloydAlgorithm(int from, int to)
+{
+	unordered_map<int, unordered_map<int, int>> WayMap;
+	for (auto& [ksid, ks] : Compressors) {
+		unordered_map <int, int> row;
+		set <int> ids = findBranches(Branches, &Branch::fromid, ksid);
+		for (auto& id : ids) {
+			if (!Pipes[Branches[id].pid].repair)
+				row.emplace(Branches[id].toid, Pipes[Branches[id].pid].length);
+		}
+		WayMap.emplace(ksid, row);
+	};
+
+	int i = 0;
+	unordered_map <int, int> KSoppIndex;
+	for (auto KS : Compressors)
+	{
+		KSoppIndex.emplace(KS.first, i);
+		++i;
+	}
+	unordered_map <int, int> IndexoppKS;
+	for (auto& [ksid, index] : KSoppIndex)
+	{
+		IndexoppKS.emplace(index, ksid);
+	}
+	vector <vector <int>> WeightMatrix;
+	WeightMatrix.assign(Compressors.size(), {});
+	for (int i = 0; i < Compressors.size(); i++)
+	{
+
+		WeightMatrix[i].assign(Compressors.size(), 0);
+	}
+	for (auto& [ksfromid, map] : WayMap)
+	{
+		for (auto& [ksinid, weight] : map) {
+			WeightMatrix[KSoppIndex[ksfromid]][KSoppIndex[ksinid]] = weight;
+		}
+
+
+	}
+	for (size_t i = 0; i < WeightMatrix.size(); i++)
+	{
+		for (size_t j = 0; j < WeightMatrix.size(); j++)
+		{
+			if (i != j) {
+				if (WeightMatrix[i][j] == 0) {
+					WeightMatrix[i][j] = 10000;
+				}
+			}
+		}	
+	}
+	vector <vector <int>> WayMatrix;
+	WayMatrix.reserve(Compressors.size());
+	for (size_t i = 0; i < Compressors.size(); i++)
+	{
+		WayMatrix.push_back({});
+		WayMatrix[i].reserve(Compressors.size());
+		for (int j = 0; j < Compressors.size(); ++j) {
+			if (j != i) {
+				WayMatrix[i].push_back(IndexoppKS[i]);
+			}
+			else {
+				WayMatrix[i].push_back(0);
+			}
+
+		}
+	}
+	
+	for (size_t k = 0; k < WeightMatrix.size(); k++)
+	{
+		for (size_t i = 0; i < WeightMatrix.size(); i++)
+		{
+			for (size_t j = 0; j < WeightMatrix.size(); j++)
+			{
+				if (i != k && j != k && WeightMatrix[i][k] + WeightMatrix[k][j] < WeightMatrix[i][j]) {
+					WeightMatrix[i][j] = WeightMatrix[i][k] + WeightMatrix[k][j];
+					WayMatrix[i][j] = WayMatrix[k][j];
+				}
 			}
 		}
+	}
+	if (WeightMatrix[KSoppIndex[from]][KSoppIndex[to]]!=10000)
+	{
+		cout << "Путь от " << from << " в " << to << " КС равен " << WeightMatrix[KSoppIndex[from]][KSoppIndex[to]] << endl;
+		cout << "Путь:";
+		vector<int>Way;
+		int j = KSoppIndex[to];
+		Way.push_back(to);
+		do
+		{
 
-
-
-
+			Way.push_back(WayMatrix[KSoppIndex[from]][j]);
+			j = KSoppIndex[WayMatrix[KSoppIndex[from]][j]];
+		} while (WayMatrix[KSoppIndex[from]][j] != from);
+		Way.push_back(from);
+		reverse(Way.begin(), Way.end());
+		for (size_t i = 0; i < Way.size() - 1; i++)
+		{
+			cout << Way[i] << "-->";
 		}
-	
-	
-	
+		cout << Way[Way.size() - 1] << endl << endl;
+	}
+	else {
+		cout << "Нет пути \n";
+	}
+
+		
 
 
 }
@@ -917,76 +1024,8 @@ void EGTS::SearchShortWay()
 	} while (Compressors.find(toid) == Compressors.end()|| toid==fromid);
 
 
-	int i = 0;
-	unordered_map <int, int> KSoppIndex;
-	for (auto KS : Compressors)
-	{
-		KSoppIndex.emplace( KS.first,i);
-		++i;
-	}
 
-
-	vector <vector <int>> Dostishimost=CreateDostichimostTable(CreateCmeshTable());
-
-	if (Dostishimost[KSoppIndex[fromid]][KSoppIndex[toid]]==1){
-		vector <vector <int>> WayMatrix;
-
-		
-		unordered_map <int, int> IndexoppKS;
-		for (auto &[ksid,index]: KSoppIndex)
-		{
-			IndexoppKS.emplace(index, ksid);
-		}
-		WayMatrix.reserve(Compressors.size());
-		for (size_t i = 0; i < Compressors.size(); i++)
-		{
-			WayMatrix.push_back({});
-			WayMatrix[i].reserve(Compressors.size());
-			for (int j = 0; j < Compressors.size(); ++j) {
-				if (j != i) {
-					WayMatrix[i].push_back(IndexoppKS[i]);
-				}
-				else {
-					WayMatrix[i].push_back(0);
-				}
-
-			}
-		}
-		vector <vector <int>> WeightMatrix = CreateCmeshTable(true);
-		for (size_t k = 0; k < WeightMatrix.size(); k++)
-		{
-			for (size_t i = 0; i < WeightMatrix.size(); i++)
-			{
-				for (size_t j = 0; j < WeightMatrix.size(); j++)
-				{
-					if (i != k && j != k && WeightMatrix[i][k] + WeightMatrix[k][j] < WeightMatrix[i][j]) {
-					WeightMatrix[i][j] = WeightMatrix[i][k] + WeightMatrix[k][j];
-					WayMatrix[i][j] = WayMatrix[k][j];
-					}	
-				}
-			}
-		}
-	
-		cout << "Путь от "<<fromid <<" в " <<toid <<" КС равен "<<WeightMatrix[KSoppIndex[fromid]][KSoppIndex[toid]]<<endl;
-		cout << "Путь:";
-		vector<int>Way;
-		int j= KSoppIndex[toid];
-		Way.push_back(toid);
-		do
-		{
-				
-				Way.push_back(WayMatrix[KSoppIndex[fromid]][j]);
-				j = KSoppIndex[WayMatrix[KSoppIndex[fromid]][j]];
-		} while (WayMatrix[KSoppIndex[fromid]][j] != fromid);
-		Way.push_back(fromid);
-		reverse(Way.begin(),Way.end());
-		for (size_t i = 0; i <Way.size()-1; i++)
-		{
-			cout << Way[i] << "-->";
-		}
-		cout << Way[Way.size() - 1] << endl << endl;
-	}
+	FloydAlgorithm(fromid, toid);
 	
 	
-
 }

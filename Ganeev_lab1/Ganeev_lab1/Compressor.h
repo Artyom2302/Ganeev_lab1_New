@@ -16,8 +16,6 @@ public:
 	unsigned int workshops ;
 	unsigned int workshopsinwork;
 	double performance ;
-
-	set <int> connectedpipe;
 	Compressor();
 	
 	void Edit();

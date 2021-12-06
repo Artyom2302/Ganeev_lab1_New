@@ -18,12 +18,15 @@ void MainMenu()
 		"9. Поиск КС" << endl <<
 		"10.Удаление  труб " << endl <<
 		"11.Удаление  КС " << endl <<
-		"12.Вывод на печать " << endl <<
+		"12.Отсоединить КС" << endl <<
 		"13.Соединить КС и трубами" << endl <<
 		"14.Вывести все соединения" << endl <<
 		"15.Cохранить связи труб и КС" << endl <<
 		"16.Загрузить связи труб и КС" << endl <<
-		"17.Выход" << endl <<
+		"17.Топологическая сортировка" << endl <<
+		"18.Поиск минимального пути" << endl <<
+		"19.Поиск максимального потока" << endl <<
+		"20.Выход" << endl <<
 		"Введите пункт меню: " << endl;
 }
 
@@ -87,6 +90,7 @@ int main() {
 		}
 		case 10: {
 			vector <int> IDs=egts.AllPipeIDs();
+			IDs = EnterSomeIDs(IDs);
 			egts.DeletePipes(IDs);
 			break;
 		}
@@ -95,45 +99,28 @@ int main() {
 		{
 			
 			vector <int> IDs = egts.AllKSIDs();
+			IDs = EnterSomeIDs(IDs);
 			egts.DeleteCompressors(IDs);
 			break;
 		}
 		case 12: {
-			cout << "Поиск файла для сохранения\n";
-			string filename = EnterName();
-			egts.SaveBuff(filename);
+			vector <int> IDs = egts.AllKSIDs();
+			IDs = EnterSomeIDs(IDs);
+			for (auto &id:IDs)
+			{
+				egts.DisconnectKS(id);
+			}
+			
 			break;
 		}
 		case 13:
 		{	
-EGTS::Branch branch = egts.CreateBranch();
+		EGTS::Branch branch = egts.CreateBranch();
 			break;
 		}
 		case 14:
 		{egts.OutBranchesInfo();
-		vector <vector <int>> massiv = egts.CreateCmeshTable();
-		for (size_t i = 0; i < massiv.size(); i++)
-		{
-			for (size_t j = 0; j < massiv.size(); j++)
-			{
-				cout << massiv[i][j] << " ";
-			}
-			cout << endl;
-		}
-		cout << endl << endl;
-		massiv = egts.CreateDostichimostTable(massiv);
-		for (size_t i = 0; i < massiv.size(); i++)
-		{
-			for (size_t j = 0; j < massiv.size(); j++)
-			{
-				cout << massiv[i][j] << " ";
-			}
-			cout << endl;
-		}
-		cout << endl << endl;
-		
-		egts.TopologicalSort();
-		egts.SearchShortWay();
+	
 
 		break; }
 		case 15:
@@ -144,7 +131,18 @@ EGTS::Branch branch = egts.CreateBranch();
 			egts.LoadInfo("Data");
 			egts.LoadBranches();
 			break;
-		case 17:
+		case 17: {
+			egts.TopologicalSort();
+			break;
+		}
+			
+		case 18: {
+			egts.SearchShortWay();
+			break;
+		}
+		case 19:
+			return 0;
+		case 20:
 			return 0;
 		default:
 			break;

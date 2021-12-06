@@ -74,14 +74,14 @@ public :
 	void DeleteKS(int id);
 	void DeletePipes(vector <int> IDs);
 	void DeleteCompressors(vector <int> IDs);
-	vector <vector <int>> CreateCmeshTable(bool weight = false);
+	vector <vector <int>> CreateCmeshTable();
 	vector <vector <int>> CreateDostichimostTable(const vector <vector <int>> &Smeschnost);
 	vector <vector <int>> CreateIncedentTable(unordered_map <int, Compressor> KSS);
-	
-	int OutPower(int compid);
+	void FloydAlgorithm(int from,int to);
+
 
 	bool CheckCycle(vector <vector <int>> Dostichimost);
-	void TopologicalSort();
+	void  TopologicalSort();
 	
 
 	//Третья лабораторная работа 
