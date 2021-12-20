@@ -972,22 +972,24 @@ void EGTS::FloydAlgorithm(int from, int to)
 	{
 		cout << "Путь от " << from << " в " << to << " КС равен " << WeightMatrix[KSoppIndex[from]][KSoppIndex[to]] << endl;
 		cout << "Путь:";
-		vector<int>Way;
+		stack <int>Way;
 		int j = KSoppIndex[to];
-		Way.push_back(to);
+		Way.push(to);
 		do
 		{
-
-			Way.push_back(WayMatrix[KSoppIndex[from]][j]);
+			
+			Way.push(WayMatrix[KSoppIndex[from]][j]);
 			j = KSoppIndex[WayMatrix[KSoppIndex[from]][j]];
-		} while (WayMatrix[KSoppIndex[from]][j] != from);
-		Way.push_back(from);
-		reverse(Way.begin(), Way.end());
-		for (size_t i = 0; i < Way.size() - 1; i++)
+		} while (Way.top() !=from);
+		
+	
+		do
 		{
-			cout << Way[i] << "-->";
-		}
-		cout << Way[Way.size() - 1] << endl << endl;
+			cout << Way.top() << "  ";
+			Way.pop();
+
+		} while (Way.size());
+		
 	}
 	else {
 		cout << "Нет пути \n";
